@@ -98,14 +98,19 @@ module Rufus
       elsif value.is_a?(String)
         value
       else
-        value.inspect
+        value
       end
 
       value = value.inspect if quote
 
       pre = (i > 0) ? text[0..i-1] : ''
+      post = text[j+1..-1]
 
-      dsub("#{pre}#{value}#{text[j+1..-1]}", dict)
+      if (pre != "" || post != "")
+        dsub("#{pre}#{value}#{post}", dict)
+      else
+        value
+      end
     end
 
     private

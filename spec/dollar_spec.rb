@@ -66,14 +66,26 @@ describe Rufus::Dollar do
         dsub("le petit ${chien} suisse").should == "le petit  suisse"
       end
 
-      it "'inspects' arrays" do
+      it "'inspects' arrays when in a string" do
 
         dsub("the ${customers}").should == 'the ["alice", "bob"]'
+        dsub("${customers} the").should == '["alice", "bob"] the'
+        dsub("the ${customers} the").should == 'the ["alice", "bob"] the'
       end
 
-      it "'inspects' hashes" do
+      it "'inspects' hashes when in a string" do
 
-        dsub("${table}").should == '{2011=>2, 2012=>7}'
+        dsub("the ${table}").should == 'the {2011=>2, 2012=>7}'
+        dsub("${table} the").should == '{2011=>2, 2012=>7} the'
+        dsub("the ${table} the").should == 'the {2011=>2, 2012=>7} the'
+      end
+
+      it "returns arrays when it's the only thing requested" do
+        dsub("${customers}").should == ["alice", "bob"]
+      end
+
+      it "returns hashes when it's the only thing requested" do
+        dsub("${table}").should == {2011=>2, 2012=>7}
       end
     end
   end
@@ -92,7 +104,8 @@ describe Rufus::Dollar do
     let(:dict) do
       {
         'B' => 'b',
-        'ab' => 'ok'
+        'ab' => 'ok',
+        'tableb' => { 2011 => 2, 2012 => 7 }
       }
     end
 
@@ -101,6 +114,10 @@ describe Rufus::Dollar do
       it 'substitutes successively' do
 
         dsub("${a${B}}").should == 'ok'
+      end
+
+      it 'substitutes successively and returns hash' do
+        dsub("${table${B}}").should == {2011 => 2, 2012 => 7}
       end
     end
   end
